@@ -14,6 +14,7 @@
 - **React App**: http://localhost:3000 (or next available port)
 - **Node.js Server**: http://localhost:5001
 - **API Endpoints**: http://localhost:5001/api
+- **API Documentation**: http://localhost:5001/api/docs
 - **MongoDB Database**: mongodb://admin:admin123@localhost:27017/Prolink
 - **MongoDB Web UI**: http://localhost:8081 (admin/admin123)
 
@@ -52,12 +53,6 @@ npm run test:coverage:complete
 
 ### Backend Combined Coverage Report
 - **Primary Report**: [combined-test-summary.html](Server/tests/coverage/combined-test-summary.html)
-- **Comprehensive Report**: [merged-coverage.html](Server/tests/coverage/merged-coverage.html)
-- **JSON Report**: [combined-test-report.json](Server/tests/coverage/combined-test-report.json)
-
-### Individual Coverage Reports
-- **Jest Coverage**: [jest/index.html](Server/tests/coverage/jest/index.html)
-- **Cucumber Coverage**: [cucumber/lcov-report/index.html](Server/tests/coverage/cucumber/lcov-report/index.html)
 
 ---
 
