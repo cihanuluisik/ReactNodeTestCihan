@@ -1,0 +1,33 @@
+node_modules
+package-lock.json
+yarn.lock
+build
+
+# dependencies
+Client/node_modules
+Server/node_modules
+Server/uploads
+Server/package-lock.json
+Server/.env
+Client/.env
+
+/.pnp
+.pnp.js
+
+.nyc_output/
+
+# production
+/build
+
+*.bat
+
+# misc
+.DS_Store
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+Server/tests/coverage
+*.pid
+.client.port

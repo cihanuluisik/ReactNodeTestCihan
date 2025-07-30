@@ -1,0 +1,33 @@
+{
+  "all": true,
+  "check-coverage": true,
+  "reporter": [
+    "text",
+    "text-summary",
+    "html",
+    "json",
+    "lcov"
+  ],
+  "report-dir": "tests/coverage",
+  "exclude": [
+    "coverage/**",
+    "tests/**",
+    "**/*.test.js",
+    "**/*.spec.js",
+    "node_modules/**",
+    "public/**",
+    "mongo-init/**"
+  ],
+  "include": [
+    "controllers/**/*.js",
+    "services/**/*.js",
+    "middlewares/**/*.js",
+    "model/schema/**/*.js",
+    "db/**/*.js",
+    "config/**/*.js"
+  ],
+  "branches": 0,
+  "lines": 0,
+  "functions": 0,
+  "statements": 0
+} 

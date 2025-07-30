@@ -1,0 +1,24 @@
+{
+  "name": "Meeting Management API",
+  "version": "1.0.0",
+  "description": "API for meeting management with role-based access control",
+  "title": "Meeting Management API Documentation",
+  "url": "http://localhost:5001",
+  "sampleUrl": "http://localhost:5001",
+  "header": {
+    "title": "Introduction",
+    "content": "This API provides meeting management functionality with role-based access control. SuperAdmin users can manage all meetings, while regular users can only manage their own meetings."
+  },
+  "footer": {
+    "title": "Support",
+    "content": "For support, please contact support@example.com"
+  },
+  "template": {
+    "withCompare": true,
+    "withGenerator": true
+  },
+  "order": [
+    "Authentication",
+    "Meetings"
+  ]
+} 
