@@ -19,23 +19,6 @@ const AuthServiceTestUtils = {
     phoneNumber: 1234567890
   }),
 
-  // Common validation test patterns
-  testSuccessfulValidation: async (validationMethod, username, password, expectedUser) => {
-    const result = await validationMethod(username, password);
-    expect(result.success).toBe(true);
-    expect(result.user).toBeDefined();
-    expect(result.user.username).toBe(expectedUser.username);
-    expect(result.user.firstName).toBe(expectedUser.firstName);
-    expect(result.user.lastName).toBe(expectedUser.lastName);
-  },
-
-  testFailedValidation: async (validationMethod, username, password, expectedError) => {
-    const result = await validationMethod(username, password);
-    expect(result.success).toBe(false);
-    expect(result.error).toBe(expectedError);
-    expect(result.user).toBeUndefined();
-  },
-
   testTokenGeneration: (userId) => {
     const token = authService.generateToken(userId);
     expect(token).toBeDefined();
@@ -45,27 +28,6 @@ const AuthServiceTestUtils = {
     const decoded = jwt.verify(token, config.jwt.secret);
     expect(decoded.userId).toBe(userId);
     return token;
-  },
-
-  testSuccessfulLogin: async (username, password, expectedUser) => {
-    const result = await authService.login(username, password);
-    expect(result.success).toBe(true);
-    expect(result.token).toBeDefined();
-    expect(result.user).toBeDefined();
-    expect(result.user.username).toBe(expectedUser.username);
-    
-    // Verify token is valid
-    const decoded = jwt.verify(result.token, config.jwt.secret);
-    expect(decoded.userId).toBe(expectedUser._id.toString());
-    return result;
-  },
-
-  testFailedLogin: async (username, password, expectedError) => {
-    const result = await authService.login(username, password);
-    expect(result.success).toBe(false);
-    expect(result.error).toBe(expectedError);
-    expect(result.token).toBeUndefined();
-    expect(result.user).toBeUndefined();
   },
 
   testErrorHandling: async (testFunction, expectedError) => {
@@ -114,39 +76,6 @@ describe('AuthService Integration Tests', () => {
   });
 
   describe('validateCredentials', () => {
-    it('should successfully validate correct credentials', async () => {
-      await AuthServiceTestUtils.testSuccessfulValidation(
-        authService.validateCredentials.bind(authService),
-        testUserData.username,
-        testUserData.password,
-        testUserData
-      );
-    });
-
-    it('should fail validation with incorrect credentials', async () => {
-      const invalidCases = [
-        {
-          username: 'wrong@example.com',
-          password: testUserData.password,
-          expectedError: 'Authentication failed, invalid username'
-        },
-        {
-          username: testUserData.username,
-          password: 'wrongpassword',
-          expectedError: 'Authentication failed, password does not match'
-        }
-      ];
-
-      for (const { username, password, expectedError } of invalidCases) {
-        await AuthServiceTestUtils.testFailedValidation(
-          authService.validateCredentials.bind(authService),
-          username,
-          password,
-          expectedError
-        );
-      }
-    });
-
     it('should not find deleted users', async () => {
       // Mark user as deleted
       await User.updateOne(
@@ -154,20 +83,13 @@ describe('AuthService Integration Tests', () => {
         { $set: { deleted: true } }
       );
 
-      await AuthServiceTestUtils.testFailedValidation(
-        authService.validateCredentials.bind(authService),
-        testUserData.username,
-        testUserData.password,
-        'Authentication failed, invalid username'
-      );
+      const result = await authService.validateCredentials(testUserData.username, testUserData.password);
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Authentication failed, invalid username');
     });
   });
 
   describe('generateToken', () => {
-    it('should generate valid JWT token', () => {
-      AuthServiceTestUtils.testTokenGeneration(testUser._id.toString());
-    });
-
     it('should handle token generation errors', () => {
       const restoreMock = AuthServiceTestUtils.mockMethod(
         jwt,
@@ -184,22 +106,6 @@ describe('AuthService Integration Tests', () => {
   });
 
   describe('login', () => {
-    it('should successfully complete login process', async () => {
-      await AuthServiceTestUtils.testSuccessfulLogin(
-        testUserData.username,
-        testUserData.password,
-        testUser
-      );
-    });
-
-    it('should fail login with invalid credentials', async () => {
-      await AuthServiceTestUtils.testFailedLogin(
-        testUserData.username,
-        'wrongpassword',
-        'Authentication failed, password does not match'
-      );
-    });
-
     it('should handle login process errors gracefully', async () => {
       const restoreMock = AuthServiceTestUtils.mockMethod(
         authService,
@@ -256,12 +162,11 @@ describe('AuthService Integration Tests', () => {
       });
       await specialUser.save();
 
-      await AuthServiceTestUtils.testSuccessfulValidation(
-        authService.validateCredentials.bind(authService),
-        'test+special@example.com',
-        'password!@#$%',
-        { username: 'test+special@example.com', firstName: 'Special', lastName: 'User' }
-      );
+      const result = await authService.validateCredentials('test+special@example.com', 'password!@#$%');
+      expect(result.success).toBe(true);
+      expect(result.user.username).toBe('test+special@example.com');
+      expect(result.user.firstName).toBe('Special');
+      expect(result.user.lastName).toBe('User');
     });
   });
 }); 

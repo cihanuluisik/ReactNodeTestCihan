@@ -6,11 +6,11 @@
 
 #### What I have built
 
+- First brought containerized Mongo db, arranged all env files to connecto to db both stand alone run and test runs.
+
 - JWT login system with bcrypt password hashing.
 
-- Full CRUD operations with MongoDB and role-based access.
-
-- Database-driven validation with Joi schemas and caching.
+- Full CRUD operations with MongoDB and role-based access and database-driven validation with Joi schemas and caching inspired by existing validation controller and code.
 
 - Split business logic into focused services (Auth, Meeting, Validation, User).
 
@@ -28,7 +28,7 @@
 
 - No hardcoded secrets, proper config management.
 
-- Complete testing setup with Cucumber and integration tests.
+- Complete testing setup with Cucumber [Cucumber](Server/tests/features) and [integration tests](Server/tests/integration).  Created [combined-test-summary.html](Server/tests/coverage/combined-test-summary.html)
 
 #### How I Built It
 

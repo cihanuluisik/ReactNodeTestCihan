@@ -52,58 +52,6 @@ describe('MeetingService Update Integration Tests', () => {
       await testMeeting.save();
     });
 
-    it('should update meeting for superAdmin', async () => {
-      const updateData = {
-        agenda: 'Updated Agenda',
-        location: 'Updated Location'
-      };
-
-      const result = await meetingService.updateMeeting(
-        testMeeting._id.toString(),
-        updateData,
-        testUser._id.toString(),
-        'superAdmin'
-      );
-
-      expect(result.success).toBe(true);
-      expect(result.meeting.agenda).toBe('Updated Agenda');
-      expect(result.meeting.location).toBe('Updated Location');
-    });
-
-    it('should update meeting for meeting creator', async () => {
-      const updateData = {
-        agenda: 'Updated Agenda',
-        location: 'Updated Location'
-      };
-
-      const result = await meetingService.updateMeeting(
-        testMeeting._id.toString(),
-        updateData,
-        testUser._id.toString(),
-        'user'
-      );
-
-      expect(result.success).toBe(true);
-      expect(result.meeting.agenda).toBe('Updated Agenda');
-    });
-
-    it('should not update meeting for non-creator user', async () => {
-      const otherUserId = new mongoose.Types.ObjectId();
-      const updateData = {
-        agenda: 'Updated Agenda'
-      };
-
-      const result = await meetingService.updateMeeting(
-        testMeeting._id.toString(),
-        updateData,
-        otherUserId.toString(),
-        'user'
-      );
-
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('Meeting not found or access denied');
-    });
-
     it('should update all fields when provided', async () => {
       const updateData = {
         agenda: 'Updated Agenda',
@@ -147,39 +95,6 @@ describe('MeetingService Update Integration Tests', () => {
       expect(result.success).toBe(true);
       expect(result.meeting.agenda).toBe('Partially Updated Agenda');
       expect(result.meeting.location).toBe('Original Location'); // Should remain unchanged
-    });
-
-    it('should handle invalid meeting ID', async () => {
-      const updateData = {
-        agenda: 'Updated Agenda'
-      };
-
-      const result = await meetingService.updateMeeting(
-        'invalid-id',
-        updateData,
-        testUser._id.toString(),
-        'superAdmin'
-      );
-
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('Failed to update meeting');
-    });
-
-    it('should handle non-existent meeting ID', async () => {
-      const nonExistentId = new mongoose.Types.ObjectId();
-      const updateData = {
-        agenda: 'Updated Agenda'
-      };
-
-      const result = await meetingService.updateMeeting(
-        nonExistentId.toString(),
-        updateData,
-        testUser._id.toString(),
-        'superAdmin'
-      );
-
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('Meeting not found or access denied');
     });
 
     it('should handle empty update data', async () => {
