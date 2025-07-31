@@ -30,6 +30,9 @@
 
 - Complete testing setup with Cucumber [Cucumber](Server/tests/features) and [integration tests](Server/tests/integration).  Created [combined-test-summary.html](Server/tests/coverage/combined-test-summary.html)
 
+![Test Coverage](Server/tests/coverage-images/coverage1.png)
+
+![Test Coverage 2](Server/tests/coverage-images/coverage2.png)
 #### How I Built It
 
 I took a practical approach - built core features using  API-first design with contract-driven development.
