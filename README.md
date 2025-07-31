@@ -32,7 +32,7 @@
 
 ![Test Coverage](Server/tests/coverage-images/coverage1.png)
 
-![Test Coverage 2](Server/tests/coverage-images/coverage2.png)
+
 #### How I Built It
 
 I took a practical approach - built core features using  API-first design with contract-driven development.
@@ -52,8 +52,11 @@ Went with honeycomb/diamond model instead of traditional pyramid. Focused on rea
 #### Architecture
 
 Layered setup with controllers, services, repositories, and validation. Testing focuses on real end-to-end scenarios. 
+KISS, DRY, YAGNI, SOLID principles.
 
+#### How does meeting features look on UI
 
+![Test Coverage](Server/tests/coverage-images/meetingPage.png)
 
 
 
