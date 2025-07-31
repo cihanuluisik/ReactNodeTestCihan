@@ -1,11 +1,11 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const UserRepository = require('../repository/UserRepository');
+const UserService = require('./UserService');
 const { config } = require('../config/environment');
 
 class AuthService {
   constructor() {
-    this.userRepository = new UserRepository();
+    this.userService = UserService;
   }
   /**
    * Validates user credentials against database
@@ -15,7 +15,7 @@ class AuthService {
    */
   async validateCredentials(username, password) {
     try {
-      const user = await this.userRepository.findByUsername(username);
+      const user = await this.userService.findUserByEmail(username);
       
       if (!user) {
         return { success: false, error: 'Authentication failed, invalid username' };

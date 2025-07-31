@@ -95,9 +95,9 @@ describe('UserService Integration Tests', () => {
 
   describe('updateUser', () => {
     it('should handle database errors during user update', async () => {
-      // Mock User.updateOne to throw an error
-      const originalUpdateOne = User.updateOne;
-      User.updateOne = jest.fn().mockRejectedValue(new Error('Database update failed'));
+      // Mock User.findOneAndUpdate to throw an error
+      const originalFindOneAndUpdate = User.findOneAndUpdate;
+      User.findOneAndUpdate = jest.fn().mockRejectedValue(new Error('Database update failed'));
 
       const fakeId = new mongoose.Types.ObjectId();
       const result = await UserService.updateUser(fakeId, { firstName: 'Test' });
@@ -106,15 +106,15 @@ describe('UserService Integration Tests', () => {
       expect(result.error).toBe('Failed to update user');
 
       // Restore original method
-      User.updateOne = originalUpdateOne;
+      User.findOneAndUpdate = originalFindOneAndUpdate;
     });
   });
 
   describe('deleteUser', () => {
     it('should handle database errors during user deletion', async () => {
-      // Mock User.updateOne to throw an error
-      const originalUpdateOne = User.updateOne;
-      User.updateOne = jest.fn().mockRejectedValue(new Error('Database delete failed'));
+      // Mock User.findOneAndUpdate to throw an error
+      const originalFindOneAndUpdate = User.findOneAndUpdate;
+      User.findOneAndUpdate = jest.fn().mockRejectedValue(new Error('Database delete failed'));
 
       const fakeId = new mongoose.Types.ObjectId();
       const result = await UserService.deleteUser(fakeId);
@@ -123,7 +123,7 @@ describe('UserService Integration Tests', () => {
       expect(result.error).toBe('Failed to delete user');
 
       // Restore original method
-      User.updateOne = originalUpdateOne;
+      User.findOneAndUpdate = originalFindOneAndUpdate;
     });
   });
 

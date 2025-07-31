@@ -28,3 +28,5 @@ yarn-error.log*
 
 *.pid
 .client.port
+
+Server/coverage

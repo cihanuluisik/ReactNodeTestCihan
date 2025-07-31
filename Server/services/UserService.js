@@ -1,8 +1,13 @@
 const bcrypt = require('bcrypt');
+const UserRepository = require('../repository/UserRepository');
 const User = require('../model/schema/user');
 const { config } = require('../config/environment');
 
 class UserService {
+  constructor() {
+    this.userRepository = new UserRepository();
+  }
+
   /**
    * Creates a new user with hashed password
    * @param {Object} userData - User data (username, password, firstName, lastName, phoneNumber)
@@ -13,7 +18,7 @@ class UserService {
       const { username, password, firstName, lastName, phoneNumber } = userData;
       
       // Check if user already exists
-      const existingUser = await User.findOne({ username });
+      const existingUser = await this.userRepository.findByUsername(username);
       if (existingUser) {
         return { success: false, error: 'User already exists, please try another email' };
       }
@@ -21,18 +26,18 @@ class UserService {
       // Hash the password using environment config
       const hashedPassword = await bcrypt.hash(password, config.security.bcryptSaltRounds);
       
-      // Create a new user
-      const user = new User({ 
-        username, 
-        password: hashedPassword, 
-        firstName, 
-        lastName, 
-        phoneNumber, 
-        createdDate: new Date() 
-      });
+      // Create user data for repository
+      const userDataForRepo = {
+        username,
+        password: hashedPassword,
+        firstName,
+        lastName,
+        phoneNumber,
+        createdDate: new Date()
+      };
       
-      // Save the user to the database
-      await user.save();
+      // Create a new user using repository
+      const user = await this.userRepository.create(userDataForRepo, null);
       return { success: true, user };
     } catch (error) {
       console.error('User creation error:', error);
@@ -50,7 +55,7 @@ class UserService {
       const { username, password, firstName, lastName, phoneNumber } = userData;
       
       // Check if admin already exists
-      const existingUser = await User.findOne({ username });
+      const existingUser = await this.userRepository.findByUsername(username);
       if (existingUser) {
         return { success: false, error: 'Admin already exist please try another email' };
       }
@@ -58,19 +63,19 @@ class UserService {
       // Hash the password
       const hashedPassword = await bcrypt.hash(password, config.security.bcryptSaltRounds);
       
-      // Create a new admin user
-      const user = new User({ 
-        username, 
-        password: hashedPassword, 
-        firstName, 
-        lastName, 
-        phoneNumber, 
+      // Create admin user data for repository
+      const userDataForRepo = {
+        username,
+        password: hashedPassword,
+        firstName,
+        lastName,
+        phoneNumber,
         role: 'superAdmin',
         createdDate: new Date()
-      });
+      };
       
-      // Save the user to the database
-      await user.save();
+      // Create a new admin user using repository
+      const user = await this.userRepository.create(userDataForRepo, null);
       return { success: true, user };
     } catch (error) {
       console.error('Admin creation error:', error);
@@ -86,16 +91,16 @@ class UserService {
    */
   async findUserByEmail(username, includeDeleted = false) {
     try {
-      const query = { username };
-      if (!includeDeleted) {
-        query.deleted = false;
+      if (includeDeleted) {
+        // For deleted users, we need to query directly since repository doesn't support this
+        const query = { username };
+        const user = await User.findOne(query).populate({
+          path: 'roles'
+        });
+        return user;
       }
       
-      const user = await User.findOne(query).populate({
-        path: 'roles'
-      });
-      
-      return user;
+      return await this.userRepository.findByUsername(username);
     } catch (error) {
       console.error('User lookup error:', error);
       return null;
@@ -110,16 +115,17 @@ class UserService {
    */
   async findUserById(userId, includeDeleted = false) {
     try {
-      const query = { _id: userId };
-      if (!includeDeleted) {
-        query.deleted = false;
+      if (includeDeleted) {
+        // For deleted users, we need to query directly since repository doesn't support this
+        const query = { _id: userId };
+        const user = await User.findOne(query).populate({
+          path: 'roles'
+        });
+        return user;
       }
       
-      const user = await User.findOne(query).populate({
-        path: 'roles'
-      });
-      
-      return user;
+      // Use repository with superAdmin role to bypass restrictions
+      return await this.userRepository.findById(userId, userId, 'superAdmin');
     } catch (error) {
       console.error('User lookup error:', error);
       return null;
@@ -134,12 +140,13 @@ class UserService {
    */
   async updateUser(userId, updateData) {
     try {
-      const result = await User.updateOne(
-        { _id: userId },
-        { $set: updateData }
-      );
+      const result = await this.userRepository.update(userId, updateData, userId, 'superAdmin');
       
-      return { success: true, result };
+      if (result) {
+        return { success: true, result: { modifiedCount: 1 } };
+      } else {
+        return { success: true, result: { modifiedCount: 0 } };
+      }
     } catch (error) {
       console.error('User update error:', error);
       return { success: false, error: 'Failed to update user' };
@@ -153,12 +160,13 @@ class UserService {
    */
   async deleteUser(userId) {
     try {
-      const result = await User.updateOne(
-        { _id: userId },
-        { $set: { deleted: true } }
-      );
+      const result = await this.userRepository.delete(userId, userId, 'superAdmin');
       
-      return { success: true, result };
+      if (result) {
+        return { success: true, result: { modifiedCount: 1 } };
+      } else {
+        return { success: true, result: { modifiedCount: 0 } };
+      }
     } catch (error) {
       console.error('User deletion error:', error);
       return { success: false, error: 'Failed to delete user' };
